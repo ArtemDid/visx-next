@@ -6,55 +6,19 @@ import { pointRadial } from 'd3-shape';
 import useForceUpdate from './useForceUpdate';
 import LinkControls from './LinkControls';
 import getLinkComponent from './getLinkComponent';
+import DATA from '../public/data';
 
 interface TreeNode {
   name: string;
+  color: string;
+  content: string;
   isExpanded?: boolean;
   children?: TreeNode[];
 }
 
-const data: TreeNode = {
-  name: 'T',
-  children: [
-    {
-      name: 'A',
-      children: [
-        { name: 'A1' },
-        { name: 'A2' },
-        { name: 'A3' },
-        {
-          name: 'C',
-          children: [
-            {
-              name: 'C1',
-            },
-            {
-              name: 'D',
-              children: [
-                {
-                  name: 'D1',
-                },
-                {
-                  name: 'D2',
-                },
-                {
-                  name: 'D3',
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    { name: 'Z' },
-    {
-      name: 'B',
-      children: [{ name: 'B1' }, { name: 'B2' }, { name: 'B3' }],
-    },
-  ],
-};
+const data: TreeNode = DATA;
 
-const defaultMargin = { top: 30, left: 30, right: 30, bottom: 70 };
+const defaultMargin = { top: 70, left: 30, right: 30, bottom: 70 };
 
 export type LinkTypesProps = {
   width: number;
@@ -68,9 +32,9 @@ export default function Example({
   margin = defaultMargin,
 }: LinkTypesProps) {
   const [layout, setLayout] = useState<string>('cartesian');
-  const [orientation, setOrientation] = useState<string>('horizontal');
-  const [linkType, setLinkType] = useState<string>('diagonal');
-  const [stepPercent, setStepPercent] = useState<number>(0.5);
+  const [orientation, setOrientation] = useState<string>('vertical');
+  const [linkType, setLinkType] = useState<string>('step');
+  const [stepPercent, setStepPercent] = useState<number>(0.8);
   const forceUpdate = useForceUpdate();
 
   const innerWidth = totalWidth - margin.left - margin.right;
@@ -135,8 +99,8 @@ export default function Example({
                 ))}
 
                 {tree.descendants().map((node, key) => {
-                  const width = 40;
-                  const height = 20;
+                  const width = 100;
+                  const height = 100;
 
                   let top: number;
                   let left: number;
@@ -154,46 +118,60 @@ export default function Example({
 
                   return (
                     <Group top={top} left={left} key={key}>
-                      {node.depth === 0 && (
-                        <circle
-                          r={12}
-                          fill="url('#links-gradient')"
-                          onClick={() => {
-                            node.data.isExpanded = !node.data.isExpanded;
-                            console.log(node);
-                            forceUpdate();
-                          }}
-                        />
-                      )}
-                      {node.depth !== 0 && (
-                        <rect
-                          height={height}
-                          width={width}
-                          y={-height / 2}
-                          x={-width / 2}
-                          fill="#272b4d"
-                          stroke={node.data.children ? '#03c0dc' : '#26deb0'}
-                          strokeWidth={1}
-                          strokeDasharray={node.data.children ? '0' : '2,2'}
-                          strokeOpacity={node.data.children ? 1 : 0.6}
-                          rx={node.data.children ? 0 : 10}
-                          onClick={() => {
-                            node.data.isExpanded = !node.data.isExpanded;
-                            console.log(node);
-                            forceUpdate();
-                          }}
-                        />
-                      )}
+                      <rect
+                        height={height}
+                        width={width}
+                        y={-height / 2}
+                        x={-width / 2}
+                        fill='blue'
+                        stroke={node.data.children ? '#fc8003' : '#26deb0'}
+                        strokeWidth={1}
+                        strokeDasharray={'2,2'}
+                        strokeOpacity={0.6}
+                        rx={10}
+                        onClick={() => {
+                          node.data.isExpanded = !node.data.isExpanded;
+                          forceUpdate();
+                        }}
+                      />
+                      <rect
+                        height={height - 40}
+                        width={width - 5}
+                        y={(-height + 30) / 2}
+                        x={(-width + 5) / 2}
+                        fill={node.data.color}
+                        stroke={node.data.children ? '#fc8003' : '#26deb0'}
+                        strokeWidth={1}
+                        strokeDasharray={'2,2'}
+                        strokeOpacity={0.6}
+                        rx={0}
+                        onClick={() => {
+                          node.data.isExpanded = !node.data.isExpanded;
+                          forceUpdate();
+                        }}
+                      />
+
                       <text
                         dy=".33em"
-                        fontSize={9}
+                        fontSize={20}
                         fontFamily="Arial"
                         textAnchor="middle"
-                        style={{ pointerEvents: 'none' }}
-                        fill={node.depth === 0 ? '#71248e' : node.children ? 'white' : '#26deb0'}
+                        style={{ pointerEvents: 'none'}}
+                        fill={'white'}
+                      >
+                        {node.data.content}
+                      </text>
+                      <text
+                        dy="3em"
+                        fontSize={14}
+                        fontFamily="Arial"
+                        textAnchor="middle"
+                        style={{ pointerEvents: 'none'}}
+                        fill={'white'}
                       >
                         {node.data.name}
                       </text>
+
                     </Group>
                   );
                 })}
@@ -205,40 +183,3 @@ export default function Example({
     </div>
   );
 }
-
-
-
-
-// const rawTree: TreeNode = {
-//   "level": 0, "name": "WR1 20KTL", "content": "", "color": "#3CB371", "child":
-//     [
-//       {
-//         "level": 1, "name": "String 1.1", "color": "#A5BB68", "content": "2722 W", "child":
-//           [
-//             { "level": 1, "name": "1.1.1", "color": "#687abb", "content": "" },
-//             { "level": 1, "name": "1.1.2", "color": "#687abb", "content": "" }
-//           ]
-//       },
-//       {
-//         "level": 1, "name": "String 1.2", "color": "#A5BB68", "content": "2722 W", "child":
-//           [
-//             { "level": 1, "name": "1.1.1", "color": "#687abb", "content": "" },
-//             { "level": 1, "name": "1.1.2", "color": "#687abb", "content": "" }
-//           ]
-//       },
-//       {
-//         "level": 1, "name": "String 1.3", "color": "#A5BB68", "content": "2722 W", "child":
-//           [
-//             { "level": 1, "name": "1.2.1", "color": "#687abb", "content": "" },
-//             { "level": 1, "name": "1.2.2", "color": "#687abb", "content": "" }
-//           ]
-//       },
-//       {
-//         "level": 1, "name": "String 1.4", "color": "#A5BB68", "content": "2722 W", "child":
-//           [
-//             { "level": 1, "name": "1.3.1", "color": "#687abb", "content": "" },
-//             { "level": 1, "name": "1.3.2", "color": "#687abb", "content": "" }
-//           ]
-//       }
-//     ]
-// };
