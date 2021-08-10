@@ -123,7 +123,7 @@ export default function Example({
                         width={width}
                         y={-height / 2}
                         x={-width / 2}
-                        fill='blue'
+                        fill='#07326A'
                         stroke={node.data.children ? '#fc8003' : '#26deb0'}
                         strokeWidth={1}
                         strokeDasharray={'2,2'}
